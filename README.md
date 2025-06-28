@@ -1,3 +1,4 @@
+![FastAPI](image/Screenshot_01.png)
 # 🧠 AI-Powered MySQL Query Assistant
 
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green?logo=fastapi)
@@ -31,7 +32,7 @@ This project is an AI-powered SQL assistant that allows users to ask natural lan
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/roktimashraful4/ai-sql-agent.git
-cd sql-assistant
+cd ai-sql-agent
 ```
 
 ### 2. Create a virtual environment
