@@ -30,7 +30,7 @@ This project is an AI-powered SQL assistant that allows users to ask natural lan
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourname/sql-assistant.git
+git clone https://github.com/roktimashraful4/ai-sql-agent.git
 cd sql-assistant
 ```
 
@@ -86,7 +86,7 @@ Visit `http://localhost:8000` in your browser.
 ---
 
 ## 🧠 Model Info
-Uses OpenRouter's free models (e.g., `deepseek/deepseek-r1-0528:free`). For better performance, use faster models like:
+Uses OpenRouter's free models (e.g., `deepseek/deepseek-r1:free`). For better performance, use faster models like:
 - `gpt-3.5-turbo`
 - `claude-3-sonnet`
 - `mistral-7b-instruct`
