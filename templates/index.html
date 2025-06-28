@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SQL Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    async function submitQuery(event) {
+      event.preventDefault();
+      const query = document.getElementById('queryInput').value.trim();
+      if (!query) return;
+
+      const formData = new FormData();
+      formData.append("query", query);
+
+      const resultArea = document.getElementById('result');
+      resultArea.innerHTML = "<p class='text-gray-500 italic'>Thinking...</p>";
+
+      try {
+        const response = await fetch('/query', {
+          method: 'POST',
+          body: formData
+        });
+
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newResult = doc.getElementById('result').innerHTML;
+        resultArea.innerHTML = newResult;
+      } catch (err) {
+        resultArea.innerHTML = "<p class='text-red-500'>An error occurred. Please try again.</p>";
+        console.error(err);
+      }
+    }
+  </script>
+  <style>
+    .tree ul {
+      list-style-type: none;
+      padding-left: 1rem;
+    }
+    .tree li::before {
+      content: '▸';
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex">
+  <!-- Sidebar -->
+  <aside class="w-1/4 h-screen bg-white shadow p-6 overflow-auto">
+    <h2 class="text-lg font-bold mb-4">📘 Schema Preview</h2>
+    <div class="tree text-sm text-gray-700">
+      <ul>
+        {% for block in schema.split('Table: ') if block.strip() %}
+          {% set parts = block.strip().split('Columns: ') %}
+          {% if parts|length == 2 %}
+            <li>
+              <strong>{{ parts[0].strip() }}</strong>
+              <ul>
+                {% for col in parts[1].split(',') %}
+                <li class="ml-2 text-gray-600">{{ col.strip() }}</li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-12">
+    <div class="max-w-3xl mx-auto bg-white shadow rounded p-8">
+      <form onsubmit="submitQuery(event)">
+        <label class="block mb-2 text-lg font-bold">Ask your database:</label>
+        <textarea id="queryInput" name="query" placeholder="e.g., Show all users"
+                  class="w-full px-4 py-2 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded">Submit</button>
+      </form>
+
+      <div id="result">
+        {% if query %}
+          <h2 class="mt-8 text-xl font-semibold">Generated SQL:</h2>
+          <pre class="bg-gray-100 p-4 border rounded text-sm overflow-x-auto">{{ query }}</pre>
+
+          {% if records %}
+            <table class="w-full mt-4 border-collapse border border-gray-300 text-sm">
+              <thead>
+                <tr class="bg-gray-100">
+                  {% for col in records[0].keys() %}
+                    <th class="border px-2 py-1 font-semibold text-left">{{ col }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in records %}
+                  <tr class="hover:bg-gray-50">
+                    {% for val in row.values() %}
+                      <td class="border px-2 py-1">{{ val }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="mt-4 text-gray-500 italic">No records found.</p>
+          {% endif %}
+        {% elif error %}
+          <div class="text-red-600 mt-6">{{ error }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</body>
+</html>
